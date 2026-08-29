@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fff7fb" />
+  <meta name="description" content="Сахар — салон красоты во Владикавказе. Маникюр, педикюр, ресницы, брови, волосы, биозавивка, шугаринг и лазер, перманентный макияж." />
+  <title>Сахар — салон красоты во Владикавказе</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+
+    /* Окно работ: шапка всегда видна, прокручиваются только фотографии */
+    #worksModal.works-modal {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 4200 !important;
+      overflow: hidden !important;
+    }
+
+    #worksModal .modal-backdrop {
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 0 !important;
+    }
+
+    #worksModal .works-panel {
+      position: absolute !important;
+      inset: 2vh 2vw !important;
+      z-index: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+      background: #fff !important;
+      border-radius: 28px !important;
+      box-shadow: 0 30px 90px rgba(0,0,0,.24) !important;
+    }
+
+    #worksModal .works-head {
+      position: relative !important;
+      z-index: 10 !important;
+      flex: 0 0 auto !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 20px !important;
+      padding: 20px 24px !important;
+      background: #fff !important;
+      border-bottom: 1px solid rgba(91,54,70,.12) !important;
+    }
+
+    #worksModal .works-head h2 {
+      margin: 3px 0 0 !important;
+    }
+
+    #worksModal .works-head > button {
+      flex: 0 0 auto !important;
+      display: grid !important;
+      place-items: center !important;
+      width: 48px !important;
+      height: 48px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 50% !important;
+      background: #fdeaf3 !important;
+      color: #2d2027 !important;
+      font-size: 28px !important;
+      line-height: 1 !important;
+      cursor: pointer !important;
+    }
+
+    /* Галерея работ — ровная сетка, без лишнего увеличения изображений */
+    #worksGallery.works-gallery {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      grid-auto-flow: row !important;
+      align-items: start !important;
+      align-content: start !important;
+      gap: 16px !important;
+      padding: 24px !important;
+      margin: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      background: #fffafb;
+    }
+
+    #worksGallery > .works-photo {
+      position: relative !important;
+      display: block !important;
+      width: 100% !important;
+      aspect-ratio: 4 / 3 !important;
+      min-width: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      background: #f7edf2 !important;
+      box-shadow: none !important;
+      transform: none !important;
+      cursor: zoom-in;
+    }
+
+    #worksGallery > .works-photo::before,
+    #worksGallery > .works-photo::after {
+      display: none !important;
+      content: none !important;
+    }
+
+    #worksGallery > .works-photo > img {
+      position: absolute !important;
+      inset: 0 !important;
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      border-radius: 0 !important;
+      transform: none !important;
+      transition: opacity .2s ease !important;
+      image-rendering: auto;
+      backface-visibility: hidden;
+    }
+
+    #worksGallery > .works-photo:hover > img {
+      transform: none !important;
+      opacity: .96;
+    }
+
+    .works-empty {
+      margin: auto;
+      padding: 40px 24px;
+      text-align: center;
+      color: #8d6e7d;
+    }
+
+    /* Увеличенное фото — оригинальные пропорции, без cover */
+    .lightbox { z-index: 5000 !important; }
+    .lightbox .modal-backdrop { z-index: 1; }
+    .lightbox img {
+      position: relative !important;
+      z-index: 2 !important;
+      display: block !important;
+      width: auto !important;
+      height: auto !important;
+      max-width: 94vw !important;
+      max-height: 90vh !important;
+      object-fit: contain !important;
+      image-rendering: auto;
+      transform: none !important;
+    }
+    .lightbox-close { z-index: 3; }
+
+    @media (max-width: 1100px) {
+      #worksGallery.works-gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+        padding: 16px !important;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .works-panel { inset: 1.5vh 2vw; border-radius: 20px; }
+      .works-head { padding: 14px 16px; }
+      .works-head button { width: 44px; height: 44px; }
+
+      #worksGallery.works-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 9px !important;
+        padding: 10px !important;
+      }
+
+      #worksGallery > .works-photo {
+        aspect-ratio: 4 / 3 !important;
+        border-radius: 12px !important;
+      }
+    }
+
+    @media (max-width: 430px) {
+      #worksGallery.works-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+    }
+  
+    /* ФИНАЛЬНЫЙ ФИКС ГАЛЕРЕИ:
+       обычная сетка с реальной высотой элементов, без наложений */
+    #worksGallery.works-gallery {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      grid-auto-rows: 340px !important;
+      grid-auto-flow: row !important;
+      align-items: stretch !important;
+      align-content: start !important;
+      gap: 16px !important;
+      padding: 20px !important;
+      margin: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+    }
+
+    #worksGallery > .works-photo {
+      position: static !important;
+      display: block !important;
+      width: 100% !important;
+      height: 340px !important;
+      min-height: 340px !important;
+      max-height: 340px !important;
+      aspect-ratio: auto !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+      border: 0 !important;
+      border-radius: 16px !important;
+      background: #f7edf2 !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    #worksGallery > .works-photo::before,
+    #worksGallery > .works-photo::after {
+      display: none !important;
+      content: none !important;
+    }
+
+    #worksGallery > .works-photo > img {
+      position: static !important;
+      inset: auto !important;
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      transform: none !important;
+    }
+
+    #worksGallery > .works-photo:hover > img {
+      transform: none !important;
+    }
+
+    @media (max-width: 1050px) {
+      #worksGallery.works-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-auto-rows: 300px !important;
+      }
+
+      #worksGallery > .works-photo {
+        height: 300px !important;
+        min-height: 300px !important;
+        max-height: 300px !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #worksGallery.works-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-auto-rows: 190px !important;
+        gap: 9px !important;
+        padding: 10px !important;
+      }
+
+      #worksGallery > .works-photo {
+        height: 190px !important;
+        min-height: 190px !important;
+        max-height: 190px !important;
+        border-radius: 12px !important;
+      }
+    }
+
+  
+    /* Мастера из masters.json */
+    .master-card[data-master-card] {
+      cursor: pointer;
+    }
+
+    .master-card[data-master-card]:focus-visible {
+      outline: 3px solid rgba(238, 108, 168, .35);
+      outline-offset: 4px;
+    }
+
+    .master-meta {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 2px 0 12px;
+      font-size: 12px;
+      color: #8d6e7d;
+    }
+
+    .master-review-link {
+      color: #8d6e7d;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(141, 110, 125, .28);
+    }
+
+    .master-review-link:hover {
+      color: #d64f91;
+      border-color: #d64f91;
+    }
+
+    .master-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .master-actions .text-link {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+      text-decoration: none;
+    }
+
+  </style>
+</head>
+<body>
+<header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Сахар — на главную">
+        <span class="brand-mark">C</span>
+        <span class="brand-text"><strong>САХАР</strong><small>beauty studio</small></span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Главное меню">
+        <a href="#services">Услуги</a>
+        <a href="#masters">Мастера</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+
+      <a class="btn btn-small" href="https://n751124.yclients.com/company/706799/personal/menu?o=" target="_blank" rel="noopener">Записаться</a>
+
+      <button class="menu-btn" aria-label="Открыть меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu" aria-hidden="true">
+      <a href="#services">Услуги</a>
+      <a href="#masters">Мастера</a>
+      <a href="#contacts">Контакты</a>
+      <a href="https://n751124.yclients.com/company/706799/personal/menu?o=" target="_blank" rel="noopener">Онлайн-запись</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-blob hero-blob-one"></div>
+      <div class="hero-blob hero-blob-two"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <span class="eyebrow">САЛОН КРАСОТЫ · ВЛАДИКАВКАЗ</span>
+          <h1>Красота, к которой хочется <em>возвращаться</em></h1>
+          <p>Маникюр, волосы, брови, ресницы и другие beauty-услуги в одном пространстве. Забота о деталях, уютная атмосфера и мастера, которым можно доверять.</p>
+          <div class="hero-actions">
+            <button class="btn" data-booking-open>Записаться онлайн</button>
+            <a class="btn btn-ghost" href="#services">Посмотреть услуги</a>
+          </div>
+          <div class="hero-meta">
+            <span><b>10:00–20:00</b> ежедневно</span>
+            <span><b>Бородинская, 5</b> Владикавказ</span>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal">
+          <div class="hero-photo-wrap">
+            <img id="heroImage" alt="Салон красоты «Сахар»" class="hero-photo" hidden />
+            <div class="hero-badge">
+              <span>♥</span>
+              <div><strong>САХАР</strong><small>твоя beauty-точка</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section services" id="services">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">НАШИ УСЛУГИ</span>
+          <h2>Всё для твоего образа</h2>
+          <p>Выбери направление, посмотри работы наших мастеров и переходи к записи.</p>
+        </div>
+
+        <div class="service-grid">
+          <article class="service-card reveal" data-service="manic" data-booking-card role="button" tabindex="0" aria-label="Записаться на маникюр">
+            <div class="service-copy"><h3>Маникюр</h3><p>Уход, покрытие, дизайн</p></div>
+            <button class="service-works-btn" data-works-category="manic" data-works-title="Маникюр">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="pedic" data-booking-card role="button" tabindex="0" aria-label="Записаться на педикюр">
+            <div class="service-copy"><h3>Педикюр</h3><p>Эстетика и комфорт</p></div>
+            <button class="service-works-btn" data-works-category="pedic" data-works-title="Педикюр">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="lashes" data-booking-card role="button" tabindex="0" aria-label="Записаться на ресницы">
+            <div class="service-copy"><h3>Ресницы</h3><p>Наращивание и ламинирование</p></div>
+            <button class="service-works-btn" data-works-category="lashes" data-works-title="Ресницы">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="brows" data-booking-card role="button" tabindex="0" aria-label="Записаться на брови">
+            <div class="service-copy"><h3>Брови</h3><p>Форма, цвет, ламинирование</p></div>
+            <button class="service-works-btn" data-works-category="brows" data-works-title="Брови">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="hair" data-booking-card role="button" tabindex="0" aria-label="Записаться на волосы">
+            <div class="service-copy"><h3>Волосы</h3><p>Стрижки, укладки, окрашивание</p></div>
+            <button class="service-works-btn" data-works-category="hair" data-works-title="Волосы">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="biowave" data-booking-card role="button" tabindex="0" aria-label="Записаться на биозавивку">
+            <div class="service-copy"><h3>Биозавивка</h3><p>Текстура и объём надолго</p></div>
+            <button class="service-works-btn" data-works-category="biowave" data-works-title="Биозавивка">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="laser" data-booking-card role="button" tabindex="0" aria-label="Записаться на шугаринг или лазер">
+            <div class="service-copy"><h3>Шугаринг / Лазер</h3><p>Гладкость и деликатный уход</p></div>
+            <button class="service-works-btn" data-works-category="laser" data-works-title="Шугаринг / Лазер">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="permanent" data-booking-card role="button" tabindex="0" aria-label="Записаться на перманентный макияж">
+            <div class="service-copy"><h3>Перманентный макияж</h3><p>Выразительность каждый день</p></div>
+            <button class="service-works-btn" data-works-category="permanent" data-works-title="Перманентный макияж">Наши работы</button>
+          </article>
+
+          <article class="service-card reveal" data-service="pirsing" data-booking-card role="button" tabindex="0" aria-label="Записаться на пирсинг">
+            <div class="service-copy"><h3>Пирсинг</h3><p>Аккуратно, эстетично и профессионально</p></div>
+            <button class="service-works-btn" data-works-category="pirsing" data-works-title="Пирсинг">Наши работы</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section masters" id="masters">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">КОМАНДА</span>
+          <h2>Мастера «Сахара»</h2>
+          <p>Команда мастеров, которая поможет подобрать услугу и создать образ именно для тебя.</p>
+        </div>
+        <div class="masters-scroll" id="mastersGrid">
+          <div class="masters-empty">Наши мастера ждут тебя в «Сахаре».</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section">
+      <div class="container">
+        <div class="cta-card reveal">
+          <div><span class="eyebrow"></span><h2>Выбери мастера и удобное время</h2><p>Онлайн-запись доступна 24/7 через YCLIENTS.</p></div>
+          <button class="btn btn-light" data-booking-open>Записаться сейчас</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contacts" id="contacts">
+      <div class="container contacts-grid">
+        <div class="contact-copy reveal">
+          <span class="eyebrow">МЫ РЯДОМ</span>
+          <h2>Заходи в «Сахар»</h2>
+          <div class="contact-list">
+            <div><span>Адрес</span><strong>г. Владикавказ, ул. Бородинская, 5</strong></div>
+            <div><span>Режим работы</span><strong>Ежедневно · 10:00–20:00</strong></div>
+            <div><span>Телефон</span><a href="tel:+79188251795">+7 918 825-17-95</a></div>
+          </div>
+          <div class="social-row">
+            <a class="social-btn"
+               href="https://wa.me/79188251795"
+               target="_blank"
+               rel="noopener"
+               aria-label="WhatsApp">
+              <img src="images/icons/whats.png" alt="">
+            </a>
+
+            <a class="social-btn"
+               href="https://t.me/+79188251795"
+               target="_blank"
+               rel="noopener"
+               aria-label="Telegram">
+              <img src="images/icons/teleg.png" alt="">
+            </a>
+
+            <a class="social-btn"
+               href="https://instagram.com/salon_saxar_vld"
+               target="_blank"
+               rel="noopener"
+               aria-label="Instagram">
+              <img src="images/icons/inst.png" alt="">
+            </a>
+
+            <a class="social-btn"
+               href="tel:+79188251795"
+               aria-label="Позвонить">
+              <img src="images/icons/phone.png" alt="">
+            </a>
+          </div>
+        </div>
+
+        <div class="route-card reveal">
+          <div class="route-map">
+            <iframe
+              title="Салон «Сахар» на карте"
+              src="https://yandex.ru/map-widget/v1/?ll=44.687509%2C43.030860&z=18&pt=44.687509%2C43.030860%2Cpm2rdm"
+              loading="lazy"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="route-info">
+            <div><strong>Бородинская, 5</strong><span>Владикавказ</span></div>
+            <a class="btn btn-small" href="https://yandex.ru/maps/?text=%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D0%BA%D0%B0%D0%B2%D0%BA%D0%B0%D0%B7%2C%20%D0%91%D0%BE%D1%80%D0%BE%D0%B4%D0%B8%D0%BD%D1%81%D0%BA%D0%B0%D1%8F%205" target="_blank" rel="noopener">Как добраться ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#top"><span class="brand-mark">C</span><span class="brand-text"><strong>САХАР</strong><small>beauty studio</small></span></a>
+      <p>© <span id="year"></span> Сахар. Салон красоты во Владикавказе.</p>
+    </div>
+  </footer>
+
+  <button class="floating-booking" data-booking-open><span>Запись</span><b>↗</b></button>
+
+  <div class="modal booking-modal" id="bookingModal" aria-hidden="true">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="booking-panel" role="dialog" aria-modal="true" aria-label="Онлайн-запись">
+      <div class="booking-head">
+        <div><strong>Онлайн-запись</strong><span>YCLIENTS</span></div>
+        <button data-modal-close aria-label="Закрыть">×</button>
+      </div>
+      <iframe id="bookingFrame" title="Онлайн-запись YCLIENTS" data-src="https://n751124.yclients.com/company/706799/personal/menu?o=" loading="lazy"></iframe>
+      <div class="booking-fallback">Не видишь форму записи? <a href="https://n751124.yclients.com/company/706799/personal/menu?o=" target="_blank" rel="noopener">Открыть онлайн-запись отдельно</a>.</div>
+    </div>
+  </div>
+
+  <div class="modal works-modal" id="worksModal" aria-hidden="true">
+    <div class="modal-backdrop" data-works-close></div>
+    <div class="works-panel" role="dialog" aria-modal="true" aria-labelledby="worksModalTitle">
+      <div class="works-head">
+        <div><span class="eyebrow">ПОРТФОЛИО</span><h2 id="worksModalTitle">Наши работы</h2></div>
+        <button data-works-close aria-label="Закрыть">×</button>
+      </div>
+      <div class="works-gallery" id="worksGallery"></div>
+      <div class="works-empty" id="worksEmpty" hidden>Работы в этом разделе скоро появятся.</div>
+    </div>
+  </div>
+
+  <div class="modal lightbox" id="lightbox" aria-hidden="true">
+    <div class="modal-backdrop" data-lightbox-close></div>
+    <button class="lightbox-close" data-lightbox-close aria-label="Закрыть">×</button>
+    <img id="lightboxImage" src="" alt="Работа мастера крупным планом" />
+  </div>
+
+  <script>
+    const menuBtn = document.querySelector('.menu-btn');
+    const mobileMenu = document.querySelector('.mobile-menu');
+
+    menuBtn.addEventListener('click', () => {
+      const open = menuBtn.getAttribute('aria-expanded') === 'true';
+      menuBtn.setAttribute('aria-expanded', String(!open));
+      mobileMenu.classList.toggle('open', !open);
+      mobileMenu.setAttribute('aria-hidden', String(open));
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+    }));
+
+    const bookingModal = document.getElementById('bookingModal');
+    const bookingFrame = document.getElementById('bookingFrame');
+
+    function isMobileBookingView() {
+      return window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    function openBookingUrl(url) {
+      if (isMobileBookingView()) {
+        window.location.href = url;
+        return;
+      }
+
+      bookingFrame.src = url;
+      bookingModal.classList.add('open');
+      bookingModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    }
+
+    function openBooking() {
+      const url = bookingFrame.dataset.src;
+      openBookingUrl(url);
+    }
+
+    function closeBooking() {
+      bookingModal.classList.remove('open');
+      bookingModal.setAttribute('aria-hidden', 'true');
+      if (!worksModal.classList.contains('open') && !lightbox.classList.contains('open')) {
+        document.body.classList.remove('modal-open');
+      }
+    }
+
+    document.querySelectorAll('[data-booking-open]').forEach(el => el.addEventListener('click', openBooking));
+    document.querySelectorAll('[data-modal-close]').forEach(el => el.addEventListener('click', closeBooking));
+
+    // Клик по самой карточке услуги открывает запись.
+    document.querySelectorAll('[data-booking-card]').forEach(card => {
+      card.addEventListener('click', openBooking);
+      card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openBooking();
+        }
+      });
+    });
+
+    const worksModal = document.getElementById('worksModal');
+    const worksGallery = document.getElementById('worksGallery');
+    const worksEmpty = document.getElementById('worksEmpty');
+    const worksModalTitle = document.getElementById('worksModalTitle');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const heroImage = document.getElementById('heroImage');
+    const mastersGrid = document.getElementById('mastersGrid');
+
+    let galleryManifest = {
+      hero: '',
+      previews: {},
+      works: {},
+      masters: []
+    };
+
+    const manifestPromise = fetch('gallery.json', { cache: 'no-store' })
+      .then(response => {
+        if (!response.ok) throw new Error('gallery.json не найден');
+        return response.json();
+      })
+      .then(data => {
+        galleryManifest = data;
+        applySiteImages();
+        return data;
+      })
+      .catch(() => {
+        applySiteImages();
+        return galleryManifest;
+      });
+
+    // Мастера хранятся отдельно от галереи и обновляются парсером YCLIENTS.
+    fetch('masters.json', { cache: 'no-store' })
+      .then(response => {
+        if (!response.ok) throw new Error('masters.json не найден');
+        return response.json();
+      })
+      .then(masters => renderMasters(masters))
+      .catch(error => {
+        console.warn('Не удалось загрузить masters.json:', error);
+        renderMasters([]);
+      });
+
+    function applySiteImages() {
+      if (galleryManifest.hero) {
+        heroImage.src = galleryManifest.hero;
+        heroImage.hidden = false;
+      }
+
+      document.querySelectorAll('[data-service]').forEach(card => {
+        const category = card.dataset.service;
+        const preview = galleryManifest.previews?.[category];
+        if (preview) {
+          card.style.setProperty('--bg', `url("${preview}")`);
+        }
+      });
+
+    }
+
+    function renderMasters(masters) {
+      mastersGrid.innerHTML = '';
+
+      if (!Array.isArray(masters) || !masters.length) {
+        mastersGrid.innerHTML = '<div class="masters-empty">Познакомься с нашей командой прямо в салоне — будем рады тебе.</div>';
+        return;
+      }
+
+      masters.forEach(master => {
+        const card = document.createElement('article');
+        card.className = 'master-card reveal visible';
+        card.dataset.masterCard = '';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute(
+          'aria-label',
+          master.name ? `Записаться к мастеру ${master.name}` : 'Записаться к мастеру'
+        );
+
+        const photo = document.createElement('div');
+        photo.className = 'master-photo';
+
+        const img = document.createElement('img');
+        img.src = master.image || '';
+        img.alt = master.name ? `Мастер ${master.name}` : 'Мастер салона «Сахар»';
+        img.loading = 'lazy';
+        photo.appendChild(img);
+
+        const name = document.createElement('h3');
+        name.textContent = master.name || 'Мастер салона';
+
+        const specialty = document.createElement('p');
+        specialty.textContent = master.specialty || 'Beauty-мастер';
+
+        const meta = document.createElement('div');
+        meta.className = 'master-meta';
+
+        if (master.reviews_count !== null &&
+            master.reviews_count !== undefined &&
+            master.reviews_count !== '') {
+          const reviewsCount = document.createElement('span');
+          reviewsCount.textContent =
+            `${master.reviews_count} ${reviewsWord(Number(master.reviews_count))}`;
+          meta.appendChild(reviewsCount);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'master-actions';
+
+        if (master.reviews_url) {
+          const reviews = document.createElement('a');
+          reviews.className = 'master-btn master-btn-white';
+          reviews.href = master.reviews_url;
+          reviews.target = '_blank';
+          reviews.rel = 'noopener';
+          reviews.textContent = 'Отзывы';
+          reviews.addEventListener('click', event => event.stopPropagation());
+          actions.appendChild(reviews);
+        }
+
+        const book = document.createElement('button');
+        book.className = 'master-btn master-btn-pink';
+        book.type = 'button';
+        book.textContent = 'Записаться';
+        book.addEventListener('click', event => {
+          event.stopPropagation();
+          openMasterBooking(master);
+        });
+
+        actions.appendChild(book);
+
+        card.append(photo, name, specialty);
+        if (meta.children.length) card.appendChild(meta);
+        card.appendChild(actions);
+
+        card.addEventListener('click', () => openMasterBooking(master));
+        card.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openMasterBooking(master);
+          }
+        });
+
+        mastersGrid.appendChild(card);
+      });
+    }
+
+    function reviewsWord(count) {
+      const n = Math.abs(count) % 100;
+      const n1 = n % 10;
+
+      if (n > 10 && n < 20) return 'отзывов';
+      if (n1 > 1 && n1 < 5) return 'отзыва';
+      if (n1 === 1) return 'отзыв';
+      return 'отзывов';
+    }
+
+    function openMasterBooking(master) {
+      const url = master?.booking_url ||
+        'https://n751124.yclients.com/company/706799/personal/select-master?o=m5667039';
+
+      openBookingUrl(url);
+    }
+
+    async function openWorks(category, title) {
+      await manifestPromise;
+
+      const preview = galleryManifest.previews?.[category] || '';
+      const images = (galleryManifest.works?.[category] || [])
+        .filter(src => src !== preview);
+      worksModalTitle.textContent = title;
+      worksGallery.innerHTML = '';
+      worksEmpty.hidden = images.length > 0;
+
+      images.forEach((src, index) => {
+        const button = document.createElement('button');
+        button.className = 'works-photo';
+        button.type = 'button';
+        button.setAttribute('aria-label', `Открыть работу ${index + 1}`);
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = `${title} — работа ${index + 1}`;
+        img.loading = 'lazy';
+
+        button.appendChild(img);
+        button.addEventListener('click', () => openLightbox(src));
+        worksGallery.appendChild(button);
+      });
+
+      worksModal.classList.add('open');
+      worksModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    }
+
+    function closeWorks() {
+      worksModal.classList.remove('open');
+      worksModal.setAttribute('aria-hidden', 'true');
+      if (!bookingModal.classList.contains('open') && !lightbox.classList.contains('open')) {
+        document.body.classList.remove('modal-open');
+      }
+    }
+
+    function openLightbox(src) {
+      lightboxImage.src = src;
+      lightbox.classList.add('open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      lightboxImage.src = '';
+      if (!worksModal.classList.contains('open') && !bookingModal.classList.contains('open')) {
+        document.body.classList.remove('modal-open');
+      }
+    }
+
+    document.querySelectorAll('[data-works-category]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        // Не даём клику по "Наши работы" открыть YCLIENTS через карточку.
+        event.stopPropagation();
+        openWorks(btn.dataset.worksCategory, btn.dataset.worksTitle);
+      });
+      btn.addEventListener('keydown', event => event.stopPropagation());
+    });
+
+    document.querySelectorAll('[data-works-close]').forEach(el => el.addEventListener('click', closeWorks));
+    document.querySelectorAll('[data-lightbox-close]').forEach(el => el.addEventListener('click', closeLightbox));
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        if (lightbox.classList.contains('open')) closeLightbox();
+        else if (worksModal.classList.contains('open')) closeWorks();
+        else if (bookingModal.classList.contains('open')) closeBooking();
+      }
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: .08 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
