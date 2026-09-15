@@ -6,13 +6,13 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 
 COMPANY_ID = "706799"
-PAGE_URL = f"https://n751124.yclients.com/company/{COMPANY_ID}/personal/select-master?o=m5667039"
+PAGE_URL = f"https://n751124.yclients.ru/company/{COMPANY_ID}/personal/select-master?o=m5667039"
 
 BOOKING_URL = (
-    f"https://n751124.yclients.com/company/{COMPANY_ID}/personal/select-master?o=m{{}}"
+    f"https://n751124.yclients.ru/company/{COMPANY_ID}/personal/select-master?o=m{{}}"
 )
 REVIEWS_URL = (
-    f"https://n751124.yclients.com/company/{COMPANY_ID}/personal/"
+    f"https://n751124.yclients.ru/company/{COMPANY_ID}/personal/"
     f"select-master/master-info/{COMPANY_ID}/{{}}?o=m{{}}"
 )
 
